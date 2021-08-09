@@ -10,7 +10,9 @@ const byte LAYERS = 2;
 int curr_lyr = 0;
 int rgb_pins[] = {3, 6, 5};
 
-int layer_colors[LAYERS][3] = {{255, 0, 0}, {0, 255, 0}};
+Event *queue[10];
+
+int layer_colors[LAYERS][3] = {{255, 0, 0}, {255, 0, 255}};
 
 char keys[ROWS][COLS] = {
     {'A','B','C','D','E'},
@@ -101,10 +103,16 @@ void setup() {
 
 void loop(){
   char key = keypad.getKey();
+  for (int i = 0; i<10; i++) {
+    if (queue[i]->time < millis()) {
+      queue[i]->functocall(1);
+    }
+  }
 }
 
 void keypadEvent(KeypadEvent key){
-  Macros[curr_lyr][key-65](keypad.getState());
+  queue[0]->functocall = Macros[curr_lyr][key-65](keypad.getState());
+  queue[0]->time = millis() + 1000;
 }
 
 void setRGB(int rgb[3]) {
@@ -134,3 +142,10 @@ void WIN_RUN(String command) {
   delay(500);
   Keyboard.println(command);
 }
+
+
+class Event {
+  public:
+    int time;
+    void (*functocall)(int);
+};
