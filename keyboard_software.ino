@@ -29,26 +29,53 @@ void MUTEM(int state){
 }
 
 
-void DRV_L(int state) {
+void DRIVE(int state) {
   if (state == PRESSED) {
-    Serial.println("DRIVE");
-    LIN_RUN("dolphin gdrive:/google1/");
+    switch (curr_lyr)
+    {
+      case 0:
+        WIN_RUN("G:\\My Drive\\# Uni\\Year 2\\Semester 2");
+        break;
+      case 1:
+        LIN_RUN("dolphin gdrive:/google1/");
+        break;
+    }
   }
 }
 
-void DRV_W(int state) {
-  
-}
-
-void LSPOT(int state) {
+void SPTFY(int state) {
   if (state == PRESSED) {
-    LIN_RUN("spotify");
+    switch (curr_lyr)
+    {
+      case 0:
+        WIN_RUN("spotify.exe");
+        break;
+      case 1:
+        LIN_RUN("spotify");
+        break;
+    }
   }
 }
 
-void WSPOT(int state) {
+void SNIPN (int state) {
   if (state == PRESSED) {
-    WIN_RUN("spotify.exe");
+
+    switch (curr_lyr)
+    {
+      case 0:
+        Keyboard.press(KEY_LEFT_GUI);
+        Keyboard.press(KEY_LEFT_SHIFT);
+        Keyboard.press('s');
+        Keyboard.releaseAll();
+        break;
+      case 1:
+        Keyboard.press(KEY_LEFT_GUI);
+        Keyboard.press('x');
+        Keyboard.releaseAll();
+        break;
+    }
+
+    
   }
 }
 
@@ -66,20 +93,61 @@ void N_LYR(int state) {
 
 void TERMI(int state) {
   if (state == PRESSED) {
-    BASH();
+    switch (curr_lyr)
+    {
+    case 0:
+      WIN_RUN("cmd");
+      break;
+    case 1:
+      BASH();
+    default:
+      break;
+    }
+  }
+}
+
+void BBORD(int state) {
+  if (state == PRESSED) {
+    switch (curr_lyr)
+    {
+    case 0:
+      WIN_RUN("https://uonline.newcastle.edu.au/");
+      break;
+    case 1:
+      LIN_RUN("xdg-open https://uonline.newcastle.edu.au/");
+      break;
+    default:
+      break;
+    }
+  }
+}
+
+void VSCOD(int state) {
+  if (state == PRESSED) {
+    switch (curr_lyr)
+    {
+    case 0:
+      WIN_RUN("code");
+      break;
+    case 1:
+      LIN_RUN("code");
+      break;
+    default:
+      break;
+    }
   }
 }
 
 void (*Macros[LAYERS][ROWS*COLS])(int state) = {
   { // WINDOWS
-    DRV_W, WSPOT, EMPTY, EMPTY, EMPTY,
-    EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-    EMPTY, EMPTY, MUTEM, EMPTY, N_LYR
+    DRIVE, SPTFY, VSCOD, EMPTY, EMPTY,
+    TERMI, BBORD, EMPTY, EMPTY, EMPTY,
+    SNIPN, EMPTY, MUTEM, EMPTY, N_LYR
   },
   { // LINUX
-    DRV_L, LSPOT, EMPTY, EMPTY, EMPTY,
-    EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-    EMPTY, EMPTY, MUTEM, EMPTY, N_LYR
+    DRIVE, SPTFY, VSCOD, EMPTY, EMPTY,
+    TERMI, BBORD, EMPTY, EMPTY, EMPTY,
+    SNIPN, EMPTY, MUTEM, EMPTY, N_LYR
   }
 };
 
@@ -131,6 +199,6 @@ void WIN_RUN(String command) {
   Keyboard.press(KEY_LEFT_GUI);
   Keyboard.press('r');
   Keyboard.releaseAll();
-  delay(500);
+  delay(200);
   Keyboard.println(command);
 }
