@@ -14,6 +14,7 @@ const byte COLS = 5;
 const byte LAYERS = 2;
 
 int curr_lyr = 0;
+int isHeld = 0;
 
 #ifdef RGB_ENABLED
 int rgb_pins[] = {3, 6, 5};
@@ -36,6 +37,68 @@ void MUTEM(int state){
   if (state == PRESSED) { 
     Keyboard.write(KEY_F15);
   }
+}
+
+void VOLUP(int state){
+ if (state == PRESSED) {
+    switch (curr_lyr)
+    {
+        case 0:
+            break;
+        case 1:
+            LIN_RUN("amixer -D pulse sset Master 5%+");
+            break;
+    }
+ }
+    if (state == HOLD) {
+     switch (curr_lyr)
+     {
+         case 0:
+             break;
+         case 1:
+             isHeld = 1; 
+     }
+    }
+    if (state == RELEASED) {
+     switch (curr_lyr)
+     {
+         case 0:
+             break;
+         case 1:
+             isHeld = 0; 
+     }
+    }
+}
+
+void VOLDW(int state){
+ if (state == PRESSED) {
+    switch (curr_lyr)
+    {
+        case 0:
+            break;
+        case 1:
+            LIN_RUN("amixer -D pulse sset Master 5%-");
+            break;
+    }
+ }
+    if (state == HOLD) {
+     switch (curr_lyr)
+     {
+         case 0:
+             break;
+         case 1:
+             isHeld = -1; 
+     }
+    }
+    if (state == RELEASED) {
+     switch (curr_lyr)
+     {
+         case 0:
+             break;
+         case 1:
+             isHeld = 0; 
+     }
+    }
 }
 
 void DRIVE(int state) {
@@ -161,8 +224,8 @@ void (*Macros[LAYERS][ROWS*COLS])(int state) = {
     SNIPN, EMPTY, MUTEM, EMPTY, N_LYR
   },
   { // LINUX
-    DRIVE, SPTFY, VSCOD, EMPTY, EMPTY,
-    TERMI, BBORD, EMPTY, EMPTY, EMPTY,
+    DRIVE, SPTFY, VSCOD, EMPTY, VOLUP,
+    TERMI, BBORD, EMPTY, EMPTY, VOLDW,
     SNIPN, EMPTY, MUTEM, EMPTY, N_LYR
   }
 };
@@ -184,6 +247,15 @@ void setup() {
 
 void loop(){
   char key = keypad.getKey();
+  if (isHeld != 0) {
+      if(isHeld == 1) {
+          LIN_RUN("amixer -D pulse sset Master 5%+");
+      }
+      else {
+          LIN_RUN("amixer -D pulse sset Master 5%-");
+      }
+      delay(200);
+  }
 }
 
 void keypadEvent(KeypadEvent key){
